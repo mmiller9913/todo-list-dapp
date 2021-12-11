@@ -25,19 +25,22 @@ App = {
     else if (window.web3) {
       // Use Mist/MetaMask's provider
       console.log('Injected web3 detected.');
-      window.web3Provider = new Web3(web3.currentProvider);
+      App.web3Provider = window.web3.currentProvider;
+        // new Web3(web3.currentProvider);
     }
     // Non-dapp browsers...
     else {
       console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
     }
+
+    web3 = new Web3(App.web3Provider);
   },
 
   loadAccount: async () => {
     // Set the current blockchain account
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     App.account = accounts[0];
-    console.log(App.account);
+    web3.eth.defaultAccount = web3.eth.accounts[0];
   },
 
   loadContract: async () => {
@@ -91,9 +94,6 @@ App = {
         .prop('checked', taskCompleted)//in the input, sets checeked="true/fa;se"
       // .on('click', App.toggleCompleted)
 
-      console.log($newTaskTemplate);
-
-
       //put the task in the correct list 
       if (taskCompleted) {
         $('#completedTaskList').append($newTaskTemplate);
@@ -105,6 +105,14 @@ App = {
       $newTaskTemplate.show()
     }
 
+  },
+
+  createTask: async() => {
+    App.setLoading(true);
+    const content = $('#newTask').val();
+    console.log(content);
+    await App.todoList.createTask(content);
+    window.location.reload();
   },
 
   setLoading: (boolean) => {
@@ -124,5 +132,4 @@ App = {
 
 document.addEventListener("DOMContentLoaded", function (event) {
   App.load();
-  console.log(artifacts);
 });

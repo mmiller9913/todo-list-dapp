@@ -17,8 +17,13 @@ contract TodoList {
         bool completed
     );
 
+    event TaskCompleted(
+        uint id,
+        bool completed
+    );
+
     //run once, on deployment   
-    //without "pulbic", compiler gives an error
+    //without "public", compiler gives an error
     //but it doesn't need to be public?
     constructor() public {
         createTask("This is a dummy task");
@@ -30,5 +35,13 @@ contract TodoList {
 
         //broadcast an event that a task was created
         emit TaskCreated(taskCount, _content, false);
+    }
+
+    function toggleCompleted(uint _id) public {
+        //get the task out of the mapping
+        Task memory _task = tasks[_id];
+        _task.completed = !_task.completed;
+        tasks[_id] = _task;
+        emit TaskCompleted(_id, _task.completed);
     }
 }
